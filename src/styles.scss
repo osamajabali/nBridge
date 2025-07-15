@@ -1,0 +1,105 @@
+body {
+  margin: 0;
+  transition: all 0.3s ease;
+  line-height: 1.5;
+  height: 100vh;
+  overflow: hidden;
+
+  [dir="ltr"] {
+    text-align: left;
+    direction: ltr;
+  }
+
+  [dir="rtl"] {
+    text-align: right;
+    direction: rtl;
+  }
+}
+
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mdc-list-item__primary-text {
+  font-size: 18px;
+  font-weight: 500 !important;
+}
+// .mdc-list-item__primary-text {
+//   color: var(--mat-sys-surface) !important;
+// }
+
+.mat-mdc-button{
+  background-color: var(--mat-sys-surface) !important;
+}
+
+.mdc-list-item__primary-text {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.action-icons {
+  color: var(--mat-sys-primary) !important;
+}
+
+
+/* Dialog Styling */
+::ng-deep .mat-dialog-container {
+  border-radius: 8px; /* Rounded corners for the dialog */
+  padding: 20px;
+  max-width: 500px; /* Maximum width of the dialog */
+  background-color: #f4f6f9; /* Light gray background for a clean look */
+}
+.mat-mdc-row, .mat-mdc-header-row, .mdc-data-table__content{
+  height: 35px !important;
+}
+
+/* Title Styling */
+.mat-dialog-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #333; /* Dark color for readability */
+  text-align: center;
+}
+
+/* Form Field Styling */
+.dialog-content .form-field {
+  width: 100%; /* Make the form fields take full width */
+  margin-bottom: 20px; /* Space between fields */
+}
+
+/* Button Styling */
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-button {
+  text-transform: none;
+  padding: 8px 16px;
+}
+
+.cancel-button:hover {
+  background-color: #f1f1f1;
+}
+
+.mat-form-field input.mat-input-element:focus {
+  border-color: #00796b; /* Change border color on focus */
+}
+
+/* Apply spacing between the dialog content */
+.mat-dialog-content {
+  padding-bottom: 20px;
+}
+
+.mat-mdc-cell{
+  padding: 5px !important;
+}

@@ -1,0 +1,31 @@
+.card {
+    height: 90%;
+    max-height: 90%;
+    overflow: hidden;
+    overflow-y: auto;
+    background-color: var(--mat-sys-surface);
+  }
+
+  .mat-mdc-row, .mat-mdc-header-row, .mdc-data-table__content{
+    height: 35px !important;
+  }
+  
+  .toolbar {
+    display: flex;
+    justify-content: flex-end; /* Aligns the button to the right */
+    padding: 0;
+    background-color: var(--mat-sys-primary);
+  }
+  
+  th{
+    background-color: var(--mat-sys-primary) !important ;
+    color: var(--mat-sys-surface) !important ;
+  }
+  td{
+    background-color: var(--mat-sys-surface) !important ;
+    color: var(--mat-sys-primary) !important ;
+  }
+  
+  mat-dialog-content {
+    padding: 20px !important;
+  }

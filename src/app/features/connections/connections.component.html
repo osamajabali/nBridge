@@ -1,0 +1,148 @@
+<mat-toolbar class="toolbar">
+    <button mat-raised-button *appHasRoles (click)="addItem()">Add New Connection</button>
+</mat-toolbar>
+
+<mat-card class="card" appearance="raised">
+    <mat-card-content>
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table-with-sticky-header">
+
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Name </th>
+                <td mat-cell *matCellDef="let element"> {{element.connectionName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="adapterId">
+                <th mat-header-cell *matHeaderCellDef> Adapter Name </th>
+                <td mat-cell *matCellDef="let element"> {{element.adapterName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="clientId">
+                <th mat-header-cell *matHeaderCellDef> Client Name </th>
+                <td mat-cell *matCellDef="let element"> {{element.clientName}} </td>
+            </ng-container>
+
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button class="action-icons" (click)="getConnectionByID(element.id)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button class="action-icons" (click)="DeleteConnection(element.id)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+    </mat-card-content>
+</mat-card>
+
+
+<!-- Dialog Template for Adding Client -->
+<ng-template #createClientDialog let-dialogRef="dialogRef">
+    <h2 mat-dialog-title>Add Connection</h2>
+    <mat-dialog-content class="dialog-content">
+        <form #connectionForm="ngForm">
+            <mat-form-field appearance="outline">
+                <mat-label>Client</mat-label>
+                <mat-select [(ngModel)]="connection.clientId" name="clientId" required >
+                    @for (client of clientOptions; track $index) {
+                    <mat-option [value]="client.id" [ngStyle]="{'color' : 'black !important'}">
+                        {{ client.name }}
+                    </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Adapter</mat-label>
+                <mat-select [(ngModel)]="connection.adapterId" name="adapterId" required>
+                    @for (adapter of adapterOptions; track $index) {
+                    <mat-option [value]="adapter.id">
+                        {{ adapter.name }}
+                    </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+            <mat-form-field appearance="outline">
+                <mat-label>Connection Name</mat-label>
+                <mat-select [(ngModel)]="connection.connectionName" name="connectionName" required                    >
+                    @for (connection of defaultData; track $index) {
+                    <mat-option [value]="connection.connectionName" (onSelectionChange)="getConnectionDetails(connection)">
+                        {{ connection.connectionName }}
+                    </mat-option>
+                    }
+                </mat-select>
+            </mat-form-field>
+
+            @if(connection.dbConnectionDetail){
+            @for (item of connection.dbConnectionDetail; track $index) {
+            <div class="mb-4">
+                <!-- Variable Name as Label -->
+                <mat-label><strong>{{ item.variableName }}</strong></mat-label>
+
+                <!-- Variable Value Field -->
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Value</mat-label>
+                    <input matInput [(ngModel)]="item.variableValue" name="{{ item.variableName }}-value" required />
+                </mat-form-field>
+
+                <!-- Description Field -->
+                <mat-form-field appearance="fill" class="w-100">
+                    <mat-label>Description</mat-label>
+                    <input matInput [(ngModel)]="connection.description" name="{{ item.variableName }}-description" />
+                </mat-form-field>
+            </div>
+            }
+            }
+
+            <!-- <mat-form-field appearance="outline">
+                <mat-label>Provider</mat-label>
+                <input matInput [(ngModel)]="connection.provider" name="provider" required />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Server</mat-label>
+                <input matInput [(ngModel)]="connection.server" name="server" required />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Database</mat-label>
+                <input matInput [(ngModel)]="connection.database" name="database" required />
+            </mat-form-field> -->
+
+            <!-- <mat-form-field appearance="outline">
+                <mat-label>Username</mat-label>
+                <input matInput [(ngModel)]="connection.username" name="username" required />
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Encrypted Password</mat-label>
+                <input matInput [(ngModel)]="connection.encryptedPassword" name="encryptedPassword" required />
+            </mat-form-field> -->
+
+            <!-- <mat-form-field appearance="outline">
+                <mat-label>Description</mat-label>
+                <input matInput [(ngModel)]="connection.description" name="description" />
+            </mat-form-field> -->
+
+            <!-- <mat-form-field appearance="outline">
+                <mat-label>Database URL</mat-label>
+                <input matInput [(ngModel)]="connection.dbUrl" name="dbUrl" required />
+            </mat-form-field> -->
+
+
+
+        </form>
+
+
+    </mat-dialog-content>
+
+    <mat-dialog-actions class="dialog-actions">
+        <button mat-button class="cancel-button" (click)="dialogRef.close()">Cancel</button>
+        <button mat-raised-button color="primary" class="save-button"
+            (click)="isUpdate ? updateConnection() : saveConnection(dialogRef,connectionForm)">Save</button>
+    </mat-dialog-actions>
+</ng-template>

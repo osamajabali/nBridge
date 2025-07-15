@@ -1,0 +1,308 @@
+<mat-toolbar class="toolbar">
+  <button mat-raised-button *appHasRoles (click)="addNewIntegration()">Add New
+    Integration</button>
+</mat-toolbar>
+
+<mat-card class="card" appearance="raised">
+  <mat-card-content>
+    @if(!showOperation){
+    <table mat-table [dataSource]="integrations"
+      class="mat-elevation-z8 table-with-sticky-header">
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef> Description </th>
+        <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+      </ng-container>
+
+      <!-- Client ID Column -->
+      <ng-container matColumnDef="clientId">
+        <th mat-header-cell *matHeaderCellDef> Client Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.client.name}} </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button class="action-icons"
+            (click)="getIntegrationID(element)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button class="action-icons"
+            (click)="DeleteIntegration(element.id)">
+            <mat-icon>delete</mat-icon>
+          </button>
+          <button mat-icon-button class="action-icons"
+            (click)="viewOperationStatusById(element.id)">
+            <mat-icon>visibility</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Operation Column -->
+      <ng-container matColumnDef="operations">
+        <th mat-header-cell *matHeaderCellDef> Operations </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="primary"
+            (click)="gtOperationsByID(element)">
+            View Operations
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="integrationColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: integrationColumns;"></tr>
+    </table>
+    }@else {
+    <div class="row">
+      <div class="col-12">
+        <button mat-button color="primary" (click)="showOperation = false">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <div class="col-12">
+        <h3 class="text-center" style="color: #006a6a;">Operations</h3>
+      </div>
+
+      <div class="col-9"></div>
+
+      <div class="col-3 my-2">
+        <button mat-stroked-button color="primary" class="mx-2"
+          (click)="checkMultiple()">
+          Execute Multiple
+        </button>
+      </div>
+    </div>
+    <table mat-table [dataSource]="operations"
+      class="mat-elevation-z8 table-with-sticky-header">
+
+      <!-- Checkbox Column -->
+      <ng-container matColumnDef="select">
+        <th mat-header-cell *matHeaderCellDef
+          style="background-color: #f7faf9  !important;">
+          <mat-checkbox (change)="selectAll($event)"></mat-checkbox>
+          <!-- Checkbox to select all -->
+        </th>
+        <td mat-cell *matCellDef="let element"
+          style="padding: 0 17px !important;">
+          <mat-checkbox [(ngModel)]="element.isSelected"></mat-checkbox>
+          <!-- Individual checkbox -->
+        </td>
+      </ng-container>
+
+      <!-- Name Column -->
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+      </ng-container>
+
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef> Description </th>
+        <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+      </ng-container>
+
+      <!-- Endpoint Column -->
+      <ng-container matColumnDef="endpoint">
+        <th mat-header-cell *matHeaderCellDef> Endpoint </th>
+        <td mat-cell *matCellDef="let element"> {{element.endpoint}} </td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="primary"
+            (click)="getLookups(element)">
+            execute operation
+          </button>
+        </td>
+      </ng-container>
+
+      <!-- Table Header and Row Definitions -->
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+
+    }
+
+  </mat-card-content>
+</mat-card>
+
+<ng-template #operationRequestDialog let-dialogRef="dialogRef">
+  <h2 mat-dialog-title>{{ 'Execute Operation' }}</h2>
+
+  <mat-dialog-content class="dialog-content">
+    <form #operationForm="ngForm">
+      <mat-form-field appearance="outline" class="form-field"
+        style="width: 100%;">
+        <mat-label>Operation ID</mat-label>
+        <input matInput name="operationId" disabled="true"
+          [(ngModel)]="operationRequest.operationId" required />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field"
+        style="width: 100%;">
+        <mat-label>Client ID</mat-label>
+        <mat-select disabled="true" name="clientId"
+          [(ngModel)]="operationRequest.clientId" required>
+          @for (client of clientOptions; track $index) {
+          <mat-option [value]="client.id">
+            {{ client.name }}
+          </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field"
+        style="width: 100%;">
+        <mat-label>Adapter ID</mat-label>
+        <mat-select name="adapterId" [(ngModel)]="operationRequest.adapterId"
+          required>
+          @for (adapter of adapterOptions; track $index) {
+          <mat-option [value]="adapter.id">
+            {{ adapter.name }}
+          </mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field"
+        style="width: 100%;">
+        <mat-label>From Date</mat-label>
+        <input matInput name="fromDate"
+          [(ngModel)]="operationRequest.parameters.fromDate" type="date"
+          required />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="form-field"
+        style="width: 100%;">
+        <mat-label>To Date</mat-label>
+        <input matInput name="toDate"
+          [(ngModel)]="operationRequest.parameters.toDate" type="date"
+          required />
+      </mat-form-field>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button
+      (click)="dialogRef.close(); isMultiple = false">Cancel</button>
+    @if (!isMultiple) {
+    <button mat-raised-button color="primary"
+      [disabled]="!operationForm.form.valid" (click)="executeOperation()">
+      {{ 'Execute' }}
+    </button>
+    }@else {
+    <button mat-raised-button color="primary"
+      [disabled]="!operationForm.form.valid"
+      (click)="executeMultipleOperation()">
+      {{ 'Execute Multiple' }}
+    </button>
+    }
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #integrationFormDialog let-dialogRef="dialogRef">
+  <h2 mat-dialog-title>{{ 'Integration Details' }}</h2>
+
+  <mat-dialog-content class="dialog-content">
+    <form #integrationForm="ngForm"
+      (ngSubmit)="submitIntegration(integrationForm)">
+
+      <!-- Name -->
+      <mat-form-field appearance="outline" class="form-field"
+        style="width: 100%;">
+        <mat-label>Name</mat-label>
+        <input matInput name="name" [(ngModel)]="integrationRequest.name"
+          required #name="ngModel"
+          placeholder="Enter integration name" />
+        @if (name.invalid && name.touched) {
+        <mat-error>Name is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Description -->
+      <mat-form-field appearance="outline" class="form-field"
+        style="width: 100%;">
+        <mat-label>Description</mat-label>
+        <textarea matInput name="description"
+          [(ngModel)]="integrationRequest.description" required
+          #description="ngModel" placeholder="Enter description"></textarea>
+        @if (description.invalid && description.touched) {
+        <mat-error>Description is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Client ID Dropdown -->
+      <mat-form-field appearance="outline" class="form-field"
+        style="width: 100%;">
+        <mat-label>Client</mat-label>
+        <mat-select name="clientId" [(ngModel)]="integrationRequest.clientId"
+          required #clientId="ngModel">
+          @for (client of clientOptions; track $index) {
+          <mat-option [value]="client.id">
+            {{ client.name }}
+          </mat-option>
+          }
+        </mat-select>
+        @if (clientId.invalid && clientId.touched) {
+        <mat-error>Client is required</mat-error>
+        }
+      </mat-form-field>
+
+      <!-- Operation IDs Multi-Select -->
+      <mat-form-field appearance="outline" class="form-field"
+        style="width: 100%;">
+        <mat-label>Operations</mat-label>
+        <mat-select name="operationIds"
+          [(ngModel)]="integrationRequest.operationIds" multiple required
+          #operationIds="ngModel">
+          @for (operation of operationOptions; track $index) {
+          <mat-option [value]="operation.id">
+            {{ operation.description }} - {{ operation.name }}
+          </mat-option>
+          }
+        </mat-select>
+        @if (operationIds.invalid && operationIds.touched) {
+        <mat-error>Select at least one operation</mat-error>
+        }
+      </mat-form-field>
+
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end" class="dialog-actions">
+    <button mat-button (click)="dialogRef.close()">Cancel</button>
+    <button mat-raised-button color="primary"
+      [disabled]="!integrationForm.form.valid"
+      (click)="isUpdate ?  updateIntegration(integrationForm) : submitIntegration(integrationForm)">
+      {{isUpdate ? 'Update' : 'Save'}}
+    </button>
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #successDialog let-dialogRef="dialogRef">
+  <h2 mat-dialog-title style="display: flex; align-items: center; gap: 8px;">
+    {{exceutionStatus.isSuccess ? 'Success' : 'Failed'}}
+    <mat-icon style="color: #006a6a;">{{ exceutionStatus.isSuccess ?
+      'check_circle' : 'error' }}</mat-icon>
+  </h2>
+  <mat-dialog-content>
+    @if (exceutionStatus.isSuccess) {
+    <p>{{exceutionStatus.value}}</p>
+    }@else {
+    <p>{{exceutionStatus.errors}}</p>
+    }
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>OK</button>
+  </mat-dialog-actions>
+</ng-template>

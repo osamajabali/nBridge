@@ -1,0 +1,93 @@
+@if(!id){
+<mat-toolbar class="toolbar">
+    <button mat-raised-button (click)="addItem()">Add New Log</button>
+</mat-toolbar>
+
+<mat-card class="card" appearance="raised">
+    <mat-card-content>
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table-with-sticky-header">
+            
+            <!-- Exception Column -->
+            <ng-container matColumnDef="exception">
+                <th mat-header-cell *matHeaderCellDef> Exception </th>
+                <td mat-cell *matCellDef="let element"> {{element.exception}} </td>
+            </ng-container>
+
+            <!-- Level Column -->
+            <ng-container matColumnDef="level">
+                <th mat-header-cell *matHeaderCellDef> Level </th>
+                <td mat-cell *matCellDef="let element"> {{element.level}} </td>
+            </ng-container>
+
+            <!-- Message Column -->
+            <ng-container matColumnDef="message">
+                <th mat-header-cell *matHeaderCellDef> Message </th>
+                <td mat-cell *matCellDef="let element"> {{element.message}} </td>
+            </ng-container>
+
+            <!-- Timestamp Column -->
+            <ng-container matColumnDef="timeStamp">
+                <th mat-header-cell *matHeaderCellDef> Time Stamp </th>
+                <td mat-cell *matCellDef="let element">
+                    {{element.timeStamp | date : 'dd/MM/yyyy HH:mm'}}
+                </td>
+            </ng-container>
+
+            <!-- Table Header and Rows -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+    </mat-card-content>
+</mat-card>
+
+
+}@else {
+<mat-toolbar class="toolbar">
+    <button mat-raised-button (click)="addItem()">Add New Log</button>
+</mat-toolbar>
+
+<mat-card class="card" appearance="raised">
+    <mat-card-content>
+        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table-with-sticky-header">
+
+            <!-- Name Column -->
+            <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef> Name </th>
+                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
+            </ng-container>
+
+            <!-- Description Column -->
+            <ng-container matColumnDef="description">
+                <th mat-header-cell *matHeaderCellDef> Description </th>
+                <td mat-cell *matCellDef="let element"> {{element.description}} </td>
+            </ng-container>
+
+            <!-- Executed At Column (previously Endpoint Column) -->
+            <ng-container matColumnDef="executedAt">
+                <th mat-header-cell *matHeaderCellDef> Executed At </th>
+                <td mat-cell *matCellDef="let element"> {{element.executedAt  | date : 'dd-MM-yyyy hh:mm'}} </td>
+            </ng-container>
+
+            <!-- Required Params Column -->
+            <ng-container matColumnDef="requiredParams">
+                <th mat-header-cell *matHeaderCellDef> Required Params </th>
+                <td mat-cell *matCellDef="let element"> {{element.requiredParams}} </td>
+            </ng-container>
+
+            <!-- Operation Log Column -->
+            <ng-container matColumnDef="operationLog">
+                <th mat-header-cell *matHeaderCellDef> Status </th>
+                <td mat-cell *matCellDef="let element">
+                    <!-- Check if operationLog is not empty and show the response of the first entry -->
+                    {{element.operationLog && element.operationLog.length > 0 ? element.operationLog[0].response : ''}}
+                </td>
+            </ng-container>
+
+            <!-- Table Header and Rows -->
+            <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
+        </table>
+    </mat-card-content>
+</mat-card>
+
+}

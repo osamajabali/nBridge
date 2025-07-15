@@ -1,0 +1,56 @@
+<mat-sidenav-container class="example-container">
+  <mat-sidenav #sidenav mode="side" opened class="example-sidenav" [fixedInViewport]="true"
+    [fixedTopGap]="options.value.top" [fixedBottomGap]="options.value.bottom">
+
+    <!-- Logo or Image -->
+    <img mat-card-image src="../../../../assets/images/logo.png" width="100%" alt="Logo">
+
+    <!-- Navigation Menu -->
+    <mat-nav-list>
+      <a mat-list-item routerLink="/layout" routerLinkActive="active-link" [routerLinkActiveOptions]="{ exact: true }" *appHasRoles>
+        <span class="d-flex justify-content-center align-items-center text-white" >
+          <mat-icon>people</mat-icon> Clients
+        </span>
+      </a>
+      <a mat-list-item class="nav-item" routerLink="/layout/connections" routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }">
+        <span class="d-flex justify-content-center align-items-center text-white" >
+          <mat-icon>link</mat-icon> Connections
+        </span>
+      </a>
+      <a mat-list-item routerLink="/layout/adapters" routerLinkActive="active-link" *appHasRoles
+        [routerLinkActiveOptions]="{ exact: true }">
+        <span class="d-flex justify-content-center align-items-center text-white" >
+          <mat-icon>settings_input_component</mat-icon> Adapters
+        </span>
+      </a>
+      <a mat-list-item routerLink="/layout/integrations" routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }">
+        <span class="d-flex justify-content-center align-items-center text-white" >
+          <mat-icon>settings</mat-icon> Integrations
+        </span>
+      </a>
+      <a mat-list-item routerLink="/layout/monitor" routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }">
+        <span class="d-flex justify-content-center align-items-center text-white" >
+          <mat-icon>settings</mat-icon> Monitor
+        </span>
+      </a>
+    </mat-nav-list>
+
+    <!-- Logout Button at the bottom -->
+    <mat-divider></mat-divider>
+    <mat-nav-list>
+      <a mat-list-item (click)="logout()">
+        <span style="color: white;" class="d-flex justify-content-center align-items-center">
+        <mat-icon>exit_to_app</mat-icon> Logout
+        </span>
+      </a>
+    </mat-nav-list>
+
+  </mat-sidenav>
+
+  <mat-sidenav-content class="content">
+    <router-outlet />
+  </mat-sidenav-content>
+</mat-sidenav-container>

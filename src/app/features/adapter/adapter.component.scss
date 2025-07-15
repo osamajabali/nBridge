@@ -1,0 +1,79 @@
+.card {
+    height: 90%;
+    max-height: 90%;
+    overflow: hidden;
+    overflow-y: auto;
+    background-color: var(--mat-sys-surface);
+  }
+  
+  .toolbar {
+    display: flex;
+    justify-content: flex-end; /* Aligns the button to the right */
+    padding: 0;
+    background-color: var(--mat-sys-primary);
+  }
+  
+  th{
+    background-color: var(--mat-sys-primary) !important ;
+    color: var(--mat-sys-surface) !important ;
+  }
+  td{
+    background-color: var(--mat-sys-surface) !important ;
+    color: var(--mat-sys-primary) !important ;
+  }
+  
+  mat-dialog-content {
+    padding: 20px !important;
+  }
+  
+/* Dialog Styling */
+::ng-deep .mat-dialog-container {
+  border-radius: 8px; /* Rounded corners for the dialog */
+  padding: 20px;
+  max-width: 500px; /* Maximum width of the dialog */
+  background-color: #f4f6f9; /* Light gray background for a clean look */
+}
+
+/* Title Styling */
+.mat-dialog-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #333; /* Dark color for readability */
+  text-align: center;
+}
+
+/* Form Field Styling */
+.dialog-content .form-field {
+  width: 100%; /* Make the form fields take full width */
+  margin-bottom: 20px; /* Space between fields */
+}
+
+/* Button Styling */
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-button {
+  text-transform: none;
+  padding: 8px 16px;
+}
+
+.cancel-button:hover {
+  background-color: #f1f1f1;
+}
+
+.mat-form-field input.mat-input-element:focus {
+  border-color: #00796b; /* Change border color on focus */
+}
+
+/* Apply spacing between the dialog content */
+.mat-dialog-content {
+  padding-bottom: 20px;
+}
+
+.mat-mdc-row, .mat-mdc-header-row, .mdc-data-table__content{
+    height: 35px !important;
+  }

@@ -1,0 +1,68 @@
+.example-container {
+  height: 100vh;
+  background: var(--mat-sys-primary);
+}
+
+.example-sidenav {
+  display: flex;
+  flex-direction: column; /* Arrange items vertically */
+  align-items: flex-start; /* Align to the start (left) */
+  justify-content: flex-start; /* Align at the top */
+  margin-top: 15px;
+  width: 200px;
+  background: var(--mat-sys-primary);
+}
+
+.example-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.content {
+  padding-top: 0;
+  padding-right: 60px;
+  padding-bottom: 15px;
+  overflow: hidden;
+  overflow-y: auto;
+  max-height: 95vh;
+}
+
+.active-link {
+  background-color: #00a7a7;
+  color: #ffffff;
+}
+
+.align-right {
+  align-self: flex-end;
+  margin-bottom: 16px;
+}
+
+.example-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+/* Style for nav list items to align icons and text */
+mat-nav-list a.mat-list-item {
+  display: flex;
+  align-items: center; /* Align items horizontally */
+  padding: 10px 20px; /* Adjust padding */
+}
+
+mat-nav-list mat-icon {
+  margin-right: 10px; /* Add space between icon and text */
+  font-size: 20px; /* Adjust icon size */
+}
+
+mat-nav-list a.mat-list-item:hover {
+  background-color: #00a7a7;
+  color: white;
+}
+
+mat-divider {
+  margin-top: auto; /* Push the logout button to the bottom */
+}

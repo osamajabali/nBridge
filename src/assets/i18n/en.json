@@ -1,0 +1,8 @@
+{
+    "HELLO": "Hello world",
+    "LOGIN": {
+      "EMAIL": "Email",
+      "PASSWORD": "Password"
+    }
+  }
+  
