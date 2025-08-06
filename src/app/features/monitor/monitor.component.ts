@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, ViewChild } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { MatIcon } from '@angular/material/icon';
+import { MatIcon, MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTableModule } from '@angular/material/table';
@@ -13,7 +13,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SpinnerService } from '../../../assets/services/spinner.service';
 import { ClientResponse, ClientRequest } from '../../core/models/client.model';
 import { ClientsService } from '../../core/services/clients.service';
-import { MonitorService, OperationLog } from '../../core/services/monitor.service';
+import { ExecutionSummary, MonitorService, OperationLog } from '../../core/services/monitor.service';
+import { MonitorOperationsDialogComponent } from './monitor-operations-dialog/monitor-operations-dialog.component';
+import { IntegrationService } from '../../core/services/integration.service';
 
 @Component({
   selector: 'app-monitor',
@@ -26,6 +28,7 @@ import { MonitorService, OperationLog } from '../../core/services/monitor.servic
     MatToolbarModule,
     FormsModule,
     MatTableModule,
+    MatIconModule,
     CommonModule
   ],
   templateUrl: './monitor.component.html',
@@ -33,44 +36,58 @@ import { MonitorService, OperationLog } from '../../core/services/monitor.servic
 })
 export class MonitorComponent {
 
+
   @ViewChild('createClientDialog') createClientDialogTemplate: any;
   readonly dialog = inject(MatDialog);
   readonly spinnerService = inject(SpinnerService);
   readonly clientService = inject(ClientsService);
   readonly monitorService = inject(MonitorService);
+  readonly integrationService = inject(IntegrationService);
   readonly router = inject(Router);
   readonly route = inject(ActivatedRoute);
   clientName: string = '';
   clientEmail: string = '';
-  displayedColumns: string[] = ['exception', 'level', 'message', 'timeStamp'];
-  displayedColumns2: string[] = ['name', 'description', 'executedAt', 'requiredParams', 'operationLog'];
+  displayedColumns: string[] = ['integrationName', 'status', 'startTime', 'actions'];
+  displayedColumns2: string[] = ['integrationName', 'status', 'startTime', 'actions'];
 
-  dataSource: OperationLog[] = [];
+  dataSource: ExecutionSummary[] = [];
+  dataSource2: ExecutionSummary[] = [];
   client: ClientRequest = new ClientRequest();
   isUpdate: boolean;
-  id : string | null = null;
+  id: string | null = null;
+  isMonitorScreen = signal<boolean>(true);
+  isViewArrow = signal<boolean>(false);
+  integrationName = signal<string>('');
+
   ngOnInit(): void {
-    localStorage.removeItem('clientId');
     this.getClient();
     this.id = this.route.snapshot.paramMap.get('id');
-    if (this.id) {
-    this.monitorService.getStatusByIntegrationID(this.id).subscribe(res => {
-      this.dataSource = res;
-    })
-    } else {
-      this.monitorService.getLogs().subscribe(res => {
-        this.dataSource = res;
-      })
+    if(this.id) {
+      this.isMonitorScreen.set(false);
+      this.getFilteredExecutionSummary(this.id);
+    }else{
+      this.getExecutionSummary()
     }
   }
 
-  getClient() {
+  getExecutionSummary() {
+    this.monitorService.getExecutionSummary().subscribe(res => {
+      this.dataSource = res;
+    })
+  }
 
+  getFilteredExecutionSummary(integrationId : string) {
+    this.monitorService.getExecutionSummary(integrationId).subscribe(res => {
+      this.dataSource2 = res;
+    })
+  }
+
+  getClient() {
     this.clientService.getAllClients().subscribe(res => {
       if (res) {
       }
     })
-  }
+  } 
 
   viewConnections(clientId: string) {
     localStorage.setItem('clientId', clientId)
@@ -149,5 +166,16 @@ export class MonitorComponent {
         this.getClient()
       }
     })
+  }
+
+  openOperationsDialog(integrationId: string): void {
+     this.integrationService.getOperationsByIntegrationID(integrationId).subscribe(res => {
+      if(res) {
+        this.dialog.open(MonitorOperationsDialogComponent, {
+          width: '70%',
+          data: res
+        });
+      } 
+     })
   }
 }

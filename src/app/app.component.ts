@@ -26,8 +26,8 @@ export class AppComponent {
     if (isPlatformBrowser(this.platformId)) {
       const savedLang = localStorage.getItem('language');
       if (savedLang) {
-        this.translate.setDefaultLang(savedLang);
-        this.setDirection(savedLang);
+        this.translate.setDefaultLang('en');
+        this.setDirection('en');
       } else {
         this.translate.setDefaultLang('en');
         this.setDirection('en');

@@ -101,5 +101,29 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .mat-mdc-cell{
-  padding: 5px !important;
+  padding: 5px 15px 5px 15px !important;
+}
+
+.mdc-checkbox__background{
+  background-color: white !important; /* Blue background */
+}
+
+/* Green checkmark when checked */
+.mat-mdc-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__background {
+  background-color: #004f4f !important; /* Green background when checked */
+  border-color: #004f4f !important;
+}
+
+/* Green checkmark icon */
+.mat-mdc-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__checkmark {
+  color: white !important;
+}
+
+/* Ensure the checkmark path is white */
+.mat-mdc-checkbox.mat-mdc-checkbox-checked .mdc-checkbox__checkmark-path {
+  stroke: white !important;
+}
+
+.cdk-overlay-pane.mat-mdc-dialog-panel{
+  max-width: 100% !important;
 }

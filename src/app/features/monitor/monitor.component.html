@@ -1,37 +1,51 @@
-@if(!id){
+@if(isMonitorScreen()){
 <mat-toolbar class="toolbar">
-    <button mat-raised-button (click)="addItem()">Add New Log</button>
-</mat-toolbar>
 
+</mat-toolbar>
 <mat-card class="card" appearance="raised">
     <mat-card-content>
-        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table-with-sticky-header">
-            
+        <table mat-table [dataSource]="dataSource"
+            class="mat-elevation-z8 monitor-table">
+
             <!-- Exception Column -->
-            <ng-container matColumnDef="exception">
-                <th mat-header-cell *matHeaderCellDef> Exception </th>
-                <td mat-cell *matCellDef="let element"> {{element.exception}} </td>
+            <ng-container matColumnDef="integrationName">
+                <th mat-header-cell *matHeaderCellDef> IntegrationName </th>
+                <td mat-cell *matCellDef="let element"
+                    (click)="isMonitorScreen.set(false); integrationName.set(element.integrationName); getFilteredExecutionSummary(element.integrationId); isViewArrow.set(true)">
+                    {{element.integrationName}} </td>
             </ng-container>
 
             <!-- Level Column -->
-            <ng-container matColumnDef="level">
-                <th mat-header-cell *matHeaderCellDef> Level </th>
-                <td mat-cell *matCellDef="let element"> {{element.level}} </td>
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef> Status </th>
+                <td mat-cell *matCellDef="let element"> {{element.status}} </td>
             </ng-container>
 
             <!-- Message Column -->
-            <ng-container matColumnDef="message">
-                <th mat-header-cell *matHeaderCellDef> Message </th>
-                <td mat-cell *matCellDef="let element"> {{element.message}} </td>
+            <ng-container matColumnDef="startTime">
+                <th mat-header-cell *matHeaderCellDef> Start Time </th>
+                <td mat-cell *matCellDef="let element"> {{element.startTime |
+                    date : 'dd-MM-yyyy hh:mm aa'}} </td>
+            </ng-container>
+
+            <!-- Action Buttons Column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> Details </th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button
+                        (click)="openOperationsDialog(element.integrationId)">
+                        <mat-icon>visibility</mat-icon> <!-- Eye icon -->
+                    </button>
+                </td>
             </ng-container>
 
             <!-- Timestamp Column -->
-            <ng-container matColumnDef="timeStamp">
+            <!-- <ng-container matColumnDef="timeStamp">
                 <th mat-header-cell *matHeaderCellDef> Time Stamp </th>
                 <td mat-cell *matCellDef="let element">
                     {{element.timeStamp | date : 'dd/MM/yyyy HH:mm'}}
                 </td>
-            </ng-container>
+            </ng-container> -->
 
             <!-- Table Header and Rows -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
@@ -40,50 +54,57 @@
     </mat-card-content>
 </mat-card>
 
-
 }@else {
 <mat-toolbar class="toolbar">
-    <button mat-raised-button (click)="addItem()">Add New Log</button>
+
 </mat-toolbar>
 
 <mat-card class="card" appearance="raised">
+    @if(isViewArrow()){
+    <div class="row">
+        <div class="col-12">
+            <button mat-icon-button color="primary"
+                (click)="isMonitorScreen.set(true); getExecutionSummary()"
+                matTooltip="Back">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+        </div>
+    </div>
+    }
     <mat-card-content>
-        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table-with-sticky-header">
+        <table mat-table [dataSource]="dataSource2"
+            class="mat-elevation-z8 monitor-table">
 
-            <!-- Name Column -->
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> Name </th>
-                <td mat-cell *matCellDef="let element"> {{element.name}} </td>
-            </ng-container>
-
-            <!-- Description Column -->
-            <ng-container matColumnDef="description">
-                <th mat-header-cell *matHeaderCellDef> Description </th>
-                <td mat-cell *matCellDef="let element"> {{element.description}} </td>
-            </ng-container>
-
-            <!-- Executed At Column (previously Endpoint Column) -->
-            <ng-container matColumnDef="executedAt">
-                <th mat-header-cell *matHeaderCellDef> Executed At </th>
-                <td mat-cell *matCellDef="let element"> {{element.executedAt  | date : 'dd-MM-yyyy hh:mm'}} </td>
-            </ng-container>
-
-            <!-- Required Params Column -->
-            <ng-container matColumnDef="requiredParams">
-                <th mat-header-cell *matHeaderCellDef> Required Params </th>
-                <td mat-cell *matCellDef="let element"> {{element.requiredParams}} </td>
-            </ng-container>
-
-            <!-- Operation Log Column -->
-            <ng-container matColumnDef="operationLog">
-                <th mat-header-cell *matHeaderCellDef> Status </th>
+            <!-- Exception Column -->
+            <ng-container matColumnDef="integrationName">
+                <th mat-header-cell *matHeaderCellDef> integrationName </th>
                 <td mat-cell *matCellDef="let element">
-                    <!-- Check if operationLog is not empty and show the response of the first entry -->
-                    {{element.operationLog && element.operationLog.length > 0 ? element.operationLog[0].response : ''}}
+                    {{element.integrationName}} </td>
+            </ng-container>
+
+            <!-- Level Column -->
+            <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef> status </th>
+                <td mat-cell *matCellDef="let element"> {{element.status}} </td>
+            </ng-container>
+
+            <!-- Message Column -->
+            <ng-container matColumnDef="startTime">
+                <th mat-header-cell *matHeaderCellDef> startTime </th>
+                <td mat-cell *matCellDef="let element"> {{element.startTime |
+                    date : 'dd-MM-yyyy hh:mm aa'}} </td>
+            </ng-container>
+
+            <!-- Action Buttons Column -->
+            <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef> Actions </th>
+                <td mat-cell *matCellDef="let element">
+                    <button mat-icon-button
+                        (click)="openOperationsDialog(element.integrationId)">
+                        <mat-icon>visibility</mat-icon> <!-- Eye icon -->
+                    </button>
                 </td>
             </ng-container>
-
-            <!-- Table Header and Rows -->
             <tr mat-header-row *matHeaderRowDef="displayedColumns2"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns2;"></tr>
         </table>

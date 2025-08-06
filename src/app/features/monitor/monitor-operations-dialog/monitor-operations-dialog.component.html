@@ -1,0 +1,31 @@
+<h2 mat-dialog-title>Operations Details</h2>
+<mat-dialog-content>
+  <table mat-table [dataSource]="data" class="mat-elevation-z8" *ngIf="data && data.length">
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef>Name</th>
+      <td mat-cell *matCellDef="let element">{{element.name}}</td>
+    </ng-container>
+    <!-- Executed At Column -->
+    <ng-container matColumnDef="executedAt">
+      <th mat-header-cell *matHeaderCellDef>Executed At</th>
+      <td mat-cell *matCellDef="let element">{{element.executedAt | date:'dd-MM-yyyy hh:mm aa'}}</td>
+    </ng-container>
+    <!-- Is Success Column -->
+    <ng-container matColumnDef="isSuccess">
+      <th mat-header-cell *matHeaderCellDef>Success</th>
+      <td mat-cell *matCellDef="let element">{{element.isSuccess ? 'Yes' : 'No'}}</td>
+    </ng-container>
+    <!-- Response Column -->
+    <ng-container matColumnDef="response">
+      <th mat-header-cell *matHeaderCellDef>Response</th>
+      <td mat-cell *matCellDef="let element">{{element.response}}</td>
+    </ng-container>
+    <tr mat-header-row *matHeaderRowDef="['name','executedAt','isSuccess','response']"></tr>
+    <tr mat-row *matRowDef="let row; columns: ['name','executedAt','isSuccess','response'];"></tr>
+  </table>
+  <div *ngIf="!data || !data.length">No operations to display.</div>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onClose()">Close</button>
+</mat-dialog-actions> 

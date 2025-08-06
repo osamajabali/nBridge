@@ -48,6 +48,7 @@ export class ClientsComponent implements OnInit {
   dataSource: ClientResponse[] = [];
   client: ClientRequest = new ClientRequest();
   isUpdate: boolean;
+  searchTerm: string = '';
 
   ngOnInit(): void {
     localStorage.removeItem('clientId');
@@ -55,11 +56,19 @@ export class ClientsComponent implements OnInit {
   }
 
   getClient() {
-    this.clientService.getAllClients().subscribe(res => {
-      if (res) {
-        this.dataSource = res;
+    this.spinnerService.show();
+    this.clientService.getAllClients().subscribe({
+      next: (res) => {
+        if (res) {
+          this.dataSource = res;
+        }
+        this.spinnerService.hide();
+      },
+      error: (error) => {
+        console.error('Error fetching clients:', error);
+        this.spinnerService.hide();
       }
-    })
+    });
   }
 
   viewConnections(clientId: string) {
@@ -77,40 +86,55 @@ export class ClientsComponent implements OnInit {
 
   saveClient(dialogRef: any, ClientForm: NgForm) {
     if (ClientForm.valid) {
+      this.spinnerService.show();
       this.client.username = this.client.email;
       this.client.name = this.client.firstName + ' ' + this.client.lastName;
 
-      this.clientService.createClient(this.client).subscribe(res => {
-        if (res) {
-          this.getClient();
-          dialogRef.close();
+      this.clientService.createClient(this.client).subscribe({
+        next: (res) => {
+          if (res) {
+            this.getClient();
+            dialogRef.close();
+          }
+          this.spinnerService.hide();
+        },
+        error: (error) => {
+          console.error('Error creating client:', error);
+          this.spinnerService.hide();
         }
-      })
+      });
     }
   }
 
   getClientByID = (id: number) => {
     this.spinnerService.show();
-    this.clientService.getClientById(id).subscribe(res => {
-      if (res) {
-        let splitName = res.name.split(' ');
-        let firstName = splitName[0];  // First value is first name
-        let lastName = splitName.length > 1 ? splitName[splitName.length - 1] : '';
+    this.clientService.getClientById(id).subscribe({
+      next: (res) => {
+        if (res) {
+          let splitName = res.name.split(' ');
+          let firstName = splitName[0];  // First value is first name
+          let lastName = splitName.length > 1 ? splitName[splitName.length - 1] : '';
+          
+          this.client = {
+            description: res.description,
+            email: res.username,
+            firstName: firstName,
+            lastName: lastName,
+            id: res.id,
+            name: res.name,
+            password: null,
+            username: res.username
+          };
+          this.isUpdate = true;
+          this.spinnerService.hide();
+          this.openDialog('800ms', '500ms');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching client:', error);
         this.spinnerService.hide();
-        this.client = {
-          description: res.description,
-          email: res.username,
-          firstName: firstName,
-          lastName : lastName,
-          id : res.id,
-          name : res.name,
-          password : null,
-          username : res.username
-        };
-        this.isUpdate = true;
-        this.openDialog('800ms', '500ms');
       }
-    })
+    });
   }
 
   addItem = () => {
@@ -120,24 +144,38 @@ export class ClientsComponent implements OnInit {
   }
 
   updateClient = (dialogRef: any) => {
-    this.client.username = this.client.firstName + this.client.lastName;
-    this.client.name = this.client.firstName + this.client.lastName;
+    this.spinnerService.show();
+    this.client.username = this.client.firstName + ' ' + this.client.lastName;
+    this.client.name = this.client.firstName + ' ' + this.client.lastName;
 
-    this.clientService.updateClient(this.client).subscribe(res => {
-      if (res) {
-        this.getClient();
-        dialogRef.close();
+    this.clientService.updateClient(this.client).subscribe({
+      next: (res) => {
+        if (res) {
+          this.getClient();
+          dialogRef.close();
+        }
+        this.spinnerService.hide();
+      },
+      error: (error) => {
+        console.error('Error updating client:', error);
+        this.spinnerService.hide();
       }
-    })
+    });
   }
 
   DeleteClient = (id: number) => {
     this.spinnerService.show();
-    this.clientService.deleteClient(id).subscribe(res => {
-      if (res) {
+    this.clientService.deleteClient(id).subscribe({
+      next: (res) => {
+        if (res) {
+          this.getClient();
+        }
         this.spinnerService.hide();
-        this.getClient()
+      },
+      error: (error) => {
+        console.error('Error deleting client:', error);
+        this.spinnerService.hide();
       }
-    })
+    });
   }
 }

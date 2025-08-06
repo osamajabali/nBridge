@@ -16,9 +16,9 @@ html {
 
   @include mat.theme-overrides((
     primary : #004f4f,
-    on-primary: #5522ac,
+    on-primary: #fdfdfd,
     body-medium: 500 1.15rem/1.3rem Arial,
     corner-large: 32px,
-    level3: 0 4px 6px 1px var(--mat-sys-surface-dim),
+    // level3: 0 4px 6px 1px var(--mat-sys-surface-dim),
   ));
 }

@@ -1,138 +1,105 @@
 <mat-toolbar class="toolbar">
-  <button mat-raised-button *appHasRoles (click)="addNewIntegration()">Add New
-    Integration</button>
+  <button mat-raised-button color="primary" *appHasRoles (click)="addNewIntegration()">
+    <mat-icon>add</mat-icon>
+    Add New Integration
+  </button>
 </mat-toolbar>
 
 <mat-card class="card" appearance="raised">
   <mat-card-content>
     @if(!showOperation){
-    <table mat-table [dataSource]="integrations"
-      class="mat-elevation-z8 table-with-sticky-header">
-
+    <table mat-table [dataSource]="integrations" class="mat-elevation-z8 integrations-table">
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> Name </th>
         <td mat-cell *matCellDef="let element"> {{element.name}} </td>
       </ng-container>
-
       <!-- Description Column -->
       <ng-container matColumnDef="description">
         <th mat-header-cell *matHeaderCellDef> Description </th>
         <td mat-cell *matCellDef="let element"> {{element.description}} </td>
       </ng-container>
-
       <!-- Client ID Column -->
       <ng-container matColumnDef="clientId">
         <th mat-header-cell *matHeaderCellDef> Client Name </th>
         <td mat-cell *matCellDef="let element"> {{element.client.name}} </td>
       </ng-container>
-
       <!-- Actions Column -->
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef> Actions </th>
         <td mat-cell *matCellDef="let element">
-          <button mat-icon-button class="action-icons"
-            (click)="getIntegrationID(element)">
+          <button mat-icon-button color="primary" class="action-icons" (click)="getIntegrationID(element)" matTooltip="Edit integration">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button class="action-icons"
-            (click)="DeleteIntegration(element.id)">
+          <button mat-icon-button color="warn" class="action-icons" (click)="DeleteIntegration(element.id)" matTooltip="Delete integration">
             <mat-icon>delete</mat-icon>
           </button>
-          <button mat-icon-button class="action-icons"
-            (click)="viewOperationStatusById(element.id)">
+          <button mat-icon-button color="accent" class="action-icons" (click)="viewOperationStatusById(element.id)" matTooltip="View operation status">
             <mat-icon>visibility</mat-icon>
           </button>
         </td>
       </ng-container>
-
       <!-- Operation Column -->
       <ng-container matColumnDef="operations">
         <th mat-header-cell *matHeaderCellDef> Operations </th>
         <td mat-cell *matCellDef="let element">
-          <button mat-raised-button color="primary"
-            (click)="gtOperationsByID(element)">
-            View Operations
-          </button>
+          <button mat-raised-button color="primary" (click)="gtOperationsByID(element)">View Operations</button>
         </td>
       </ng-container>
-
       <tr mat-header-row *matHeaderRowDef="integrationColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: integrationColumns;"></tr>
     </table>
     }@else {
     <div class="row">
       <div class="col-12">
-        <button mat-button color="primary" (click)="showOperation = false">
+        <button mat-icon-button color="primary" (click)="showOperation = false" matTooltip="Back">
           <mat-icon>arrow_back</mat-icon>
         </button>
       </div>
       <div class="col-12">
         <h3 class="text-center" style="color: #006a6a;">Operations</h3>
       </div>
-
       <div class="col-9"></div>
-
       <div class="col-3 my-2">
-        <button mat-stroked-button color="primary" class="mx-2"
-          (click)="checkMultiple()">
-          Execute Multiple
-        </button>
+        <button mat-raised-button color="primary" class="mx-2" (click)="checkMultiple()">Execute Multiple</button>
       </div>
     </div>
-    <table mat-table [dataSource]="operations"
-      class="mat-elevation-z8 table-with-sticky-header">
-
+    <table mat-table [dataSource]="operations" class="mat-elevation-z8 integrations-table">
       <!-- Checkbox Column -->
       <ng-container matColumnDef="select">
-        <th mat-header-cell *matHeaderCellDef
-          style="background-color: #f7faf9  !important;">
+        <th mat-header-cell *matHeaderCellDef>
           <mat-checkbox (change)="selectAll($event)"></mat-checkbox>
-          <!-- Checkbox to select all -->
         </th>
-        <td mat-cell *matCellDef="let element"
-          style="padding: 0 17px !important;">
+        <td mat-cell *matCellDef="let element" style="padding: 0 17px !important;">
           <mat-checkbox [(ngModel)]="element.isSelected"></mat-checkbox>
-          <!-- Individual checkbox -->
         </td>
       </ng-container>
-
       <!-- Name Column -->
       <ng-container matColumnDef="name">
         <th mat-header-cell *matHeaderCellDef> Name </th>
         <td mat-cell *matCellDef="let element"> {{element.name}} </td>
       </ng-container>
-
       <!-- Description Column -->
       <ng-container matColumnDef="description">
         <th mat-header-cell *matHeaderCellDef> Description </th>
         <td mat-cell *matCellDef="let element"> {{element.description}} </td>
       </ng-container>
-
       <!-- Endpoint Column -->
       <ng-container matColumnDef="endpoint">
         <th mat-header-cell *matHeaderCellDef> Endpoint </th>
         <td mat-cell *matCellDef="let element"> {{element.endpoint}} </td>
       </ng-container>
-
       <!-- Actions Column -->
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef> Actions </th>
         <td mat-cell *matCellDef="let element">
-          <button mat-raised-button color="primary"
-            (click)="getLookups(element)">
-            execute operation
-          </button>
+          <button mat-raised-button color="primary" (click)="getLookups(element)">execute operation</button>
         </td>
       </ng-container>
-
-      <!-- Table Header and Row Definitions -->
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
-
     }
-
   </mat-card-content>
 </mat-card>
 

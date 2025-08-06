@@ -104,6 +104,20 @@ export class ConnectionsComponent implements OnInit {
     this.connection.dbConnectionDetail = connection.dbConnectionDetail;
   }
 
+  // Method to handle connection details when editing
+  loadConnectionDetails() {
+    if (this.connection.dbConnectionDetail && this.connection.dbConnectionDetail.length > 0) {
+      // Connection details are already loaded from the API
+      return;
+    }
+    
+    // If no connection details, try to load from default data
+    const defaultConnection = this.defaultData.find(d => d.connectionName === this.connection.connectionName);
+    if (defaultConnection) {
+      this.connection.dbConnectionDetail = defaultConnection.dbConnectionDetail || [];
+    }
+  }
+
   openDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
     this.dialog.open(this.createClientDialogTemplate, {
       width: '50%',
@@ -129,14 +143,35 @@ export class ConnectionsComponent implements OnInit {
 
   getConnectionByID = (id: number) => {
     this.spinnerService.show();
-    this.connectionService.getConnectionById(id).subscribe(res => {
-      if (res) {
+    this.connectionService.getConnectionById(id).subscribe({
+      next: (res) => {
+        if (res) {
+          // Properly map the connection data
+          this.connection = {
+            id: res.id,
+            connectionName: res.connectionName,
+            description: res.description,
+            adapterId: res.adapterId,
+            adapter: res.adapter,
+            clientId: res.clientId,
+            client: res.client,
+            dbConnectionDetail: res.dbConnectionDetail || [],
+            userId: res.userId
+          };
+          
+          // Load connection details if needed
+          this.loadConnectionDetails();
+          
+          this.isUpdate = true;
+          this.spinnerService.hide();
+          this.openDialog('800ms', '500ms');
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching connection:', error);
         this.spinnerService.hide();
-        this.connection = res;
-        this.isUpdate = true;
-        this.openDialog('800ms', '500ms');
       }
-    })
+    });
   }
 
   addItem = () => {
@@ -145,16 +180,25 @@ export class ConnectionsComponent implements OnInit {
     this.openDialog('800ms', '500ms');
   }
 
-  updateConnection = () => {
+  updateConnection = (dialogRef?: any) => {
     this.spinnerService.show();
-    let userId = this.clientOptions.find(x => x.id == this.connection.clientId).userId;
+    let userId = this.clientOptions.find(x => x.id == this.connection.clientId)?.userId;
     this.connection.userId = userId ? userId : '';
-    this.connectionService.updateConnection(this.connection).subscribe(res => {
-      if (res) {
-        this.getConnections();
+    this.connectionService.updateConnection(this.connection).subscribe({
+      next: (res) => {
+        if (res) {
+          this.getConnections();
+          if (dialogRef) {
+            dialogRef.close();
+          }
+          this.spinnerService.hide();
+        }
+      },
+      error: (error) => {
+        console.error('Error updating connection:', error);
         this.spinnerService.hide();
       }
-    })
+    });
   }
 
   DeleteConnection = (id: number) => {

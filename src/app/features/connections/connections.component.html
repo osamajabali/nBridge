@@ -1,49 +1,46 @@
 <mat-toolbar class="toolbar">
-    <button mat-raised-button *appHasRoles (click)="addItem()">Add New Connection</button>
+  <button mat-raised-button color="primary" *appHasRoles (click)="addItem()">
+    <mat-icon>add</mat-icon>
+    Add New Connection
+  </button>
 </mat-toolbar>
 
 <mat-card class="card" appearance="raised">
-    <mat-card-content>
-        <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 table-with-sticky-header">
-
-            <ng-container matColumnDef="name">
-                <th mat-header-cell *matHeaderCellDef> Name </th>
-                <td mat-cell *matCellDef="let element"> {{element.connectionName}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="adapterId">
-                <th mat-header-cell *matHeaderCellDef> Adapter Name </th>
-                <td mat-cell *matCellDef="let element"> {{element.adapterName}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="clientId">
-                <th mat-header-cell *matHeaderCellDef> Client Name </th>
-                <td mat-cell *matCellDef="let element"> {{element.clientName}} </td>
-            </ng-container>
-
-            <ng-container matColumnDef="actions">
-                <th mat-header-cell *matHeaderCellDef> Actions </th>
-                <td mat-cell *matCellDef="let element">
-                    <button mat-icon-button class="action-icons" (click)="getConnectionByID(element.id)">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button class="action-icons" (click)="DeleteConnection(element.id)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </td>
-            </ng-container>
-
-            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
-        </table>
-
-    </mat-card-content>
+  <mat-card-content>
+    <table mat-table [dataSource]="dataSource" class="mat-elevation-z8 connections-table">
+      <ng-container matColumnDef="name">
+        <th mat-header-cell *matHeaderCellDef> Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.connectionName}} </td>
+      </ng-container>
+      <ng-container matColumnDef="adapterId">
+        <th mat-header-cell *matHeaderCellDef> Adapter Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.adapterName}} </td>
+      </ng-container>
+      <ng-container matColumnDef="clientId">
+        <th mat-header-cell *matHeaderCellDef> Client Name </th>
+        <td mat-cell *matCellDef="let element"> {{element.clientName}} </td>
+      </ng-container>
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> Actions </th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-icon-button color="primary" class="action-icons" (click)="getConnectionByID(element.id)" matTooltip="Edit connection">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" class="action-icons" (click)="DeleteConnection(element.id)" matTooltip="Delete connection">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </mat-card-content>
 </mat-card>
 
 
 <!-- Dialog Template for Adding Client -->
 <ng-template #createClientDialog let-dialogRef="dialogRef">
-    <h2 mat-dialog-title>Add Connection</h2>
+    <h2 mat-dialog-title>{{ isUpdate ? 'Edit Connection' : 'Add Connection' }}</h2>
     <mat-dialog-content class="dialog-content">
         <form #connectionForm="ngForm">
             <mat-form-field appearance="outline">
@@ -68,13 +65,17 @@
             </mat-form-field>
             <mat-form-field appearance="outline">
                 <mat-label>Connection Name</mat-label>
-                <mat-select [(ngModel)]="connection.connectionName" name="connectionName" required                    >
-                    @for (connection of defaultData; track $index) {
-                    <mat-option [value]="connection.connectionName" (onSelectionChange)="getConnectionDetails(connection)">
-                        {{ connection.connectionName }}
-                    </mat-option>
-                    }
-                </mat-select>
+                @if (!isUpdate) {
+                    <mat-select [(ngModel)]="connection.connectionName" name="connectionName" required>
+                        @for (connection of defaultData; track $index) {
+                        <mat-option [value]="connection.connectionName" (onSelectionChange)="getConnectionDetails(connection)">
+                            {{ connection.connectionName }}
+                        </mat-option>
+                        }
+                    </mat-select>
+                } @else {
+                    <input matInput [(ngModel)]="connection.connectionName" name="connectionName" required>
+                }
             </mat-form-field>
 
             @if(connection.dbConnectionDetail){
@@ -92,7 +93,7 @@
                 <!-- Description Field -->
                 <mat-form-field appearance="fill" class="w-100">
                     <mat-label>Description</mat-label>
-                    <input matInput [(ngModel)]="connection.description" name="{{ item.variableName }}-description" />
+                    <input matInput [(ngModel)]="item.description" name="{{ item.variableName }}-description" />
                 </mat-form-field>
             </div>
             }
@@ -143,6 +144,6 @@
     <mat-dialog-actions class="dialog-actions">
         <button mat-button class="cancel-button" (click)="dialogRef.close()">Cancel</button>
         <button mat-raised-button color="primary" class="save-button"
-            (click)="isUpdate ? updateConnection() : saveConnection(dialogRef,connectionForm)">Save</button>
+            (click)="isUpdate ? updateConnection(dialogRef) : saveConnection(dialogRef,connectionForm)">Save</button>
     </mat-dialog-actions>
 </ng-template>

@@ -33,7 +33,7 @@ export class ConnectionsService {
   }
 
   updateConnection = (connection : any): Observable<any> => {
-    return this.apiHlpr.put<any>(`${this.controller}/${connection.id}`, {name : connection.name})
+    return this.apiHlpr.put<any>(`${this.controller}/${connection.id}`, connection)
   }
 
   deleteConnection = (id : number): Observable<any> => {
