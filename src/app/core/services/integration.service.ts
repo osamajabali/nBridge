@@ -39,8 +39,8 @@ export class IntegrationService {
     return this.apiHlpr.get<Integration>(`Integration/${integrationId}`);
   }
 
-  updateIntegration = (integrationRequest : IntegrationRequest): Observable<ExceutionStatus> => {
-    return this.apiHlpr.put<ExceutionStatus>(`Integration` , integrationRequest);
+  updateIntegration = (integrationRequest : IntegrationRequest , integrationId : string ): Observable<ExceutionStatus> => {
+    return this.apiHlpr.put<ExceutionStatus>(`Integration/${integrationId}` , integrationRequest);
   }
 
   deleteIntegration = (id : string): Observable<ExceutionStatus> => {

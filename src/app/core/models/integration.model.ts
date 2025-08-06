@@ -4,7 +4,7 @@ export class IntegrationOperation {
   operation: any;
   id!: string;
   operationId: string;
-  isSelected: boolean;
+  isSelected: boolean = false;
 }
 
 export class Integration {
@@ -21,6 +21,7 @@ export class Integration {
   };
   integrationOperations!: IntegrationOperation[];
   id!: string;
+  integrationId!: string;
 }
 
 export class OperationRequest {
@@ -48,6 +49,7 @@ export class IntegrationRequest {
   clientId: string;
   operationIds: string[];
   userId : string;
+  integrationId : string
 };
 
 export class Operation {

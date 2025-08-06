@@ -79,45 +79,74 @@ export class IntegrationsComponent implements OnInit {
     this.getIntegrations();
   }
 
+
+
+
+
+
+
   selectAll(event: any) {
     const checked = event.checked;
     this.operations.forEach(element => element.isSelected = checked);
   }
 
   getIntegrations() {
-    this.integrationService.getAllIntegrations().subscribe(res => {
-      if (res) {
-        this.integrations = res;
+    this.integrationService.getAllIntegrations().subscribe({
+      next: (res) => {
+        if (res) {
+          this.integrations = res;
+        }
+        this.spinnerService.hide();
+      },
+      error: (error) => {
+        console.error('Error fetching integrations:', error);
         this.spinnerService.hide();
       }
-    })
+    });
   }
 
   gtOperationsByID(element: Integration) {
     this.operationRequest.clientId = element.clientId;
     this.spinnerService.show();
-    this.integrationService.getOperationsByIntegrationID(element.id).subscribe(res => {
-      if (res) {
-        this.showOperation = true;
-        this.operations = res;
+    this.integrationService.getOperationsByIntegrationID(element.id).subscribe({
+      next: (res) => {
+        if (res) {
+          this.showOperation = true;
+          // Initialize isSelected property for each operation
+          this.operations = res.map(operation => ({
+            ...operation,
+            isSelected: false
+          }));
+        }
+        this.spinnerService.hide();
+      },
+      error: (error) => {
+        console.error('Error fetching operations:', error);
         this.spinnerService.hide();
       }
-    })
+    });
   }
 
   executeOperation() {
     this.spinnerService.show();
-    this.integrationService.executeOperation(this.operationRequest).subscribe(res => {
-      if (res) {
+    this.integrationService.executeOperation(this.operationRequest).subscribe({
+      next: (res) => {
+        if (res) {
+          this.exceutionStatus = res;
+          this.dialog.closeAll();
+          this.showSuccess();
+        }
         this.spinnerService.hide();
-        this.exceutionStatus = res;
-        this.dialog.closeAll();
-        this.showSuccess();
+      },
+      error: (error) => {
+        console.error('Error executing operation:', error);
+        this.spinnerService.hide();
       }
-    })
+    });
   }
 
   executeMultipleOperation() {
+    this.spinnerService.show();
     let operationForExcecution: OperationRequest[] = this.selectedOperations.map(operation => {
       return {
         operationId: operation.id,
@@ -130,11 +159,18 @@ export class IntegrationsComponent implements OnInit {
       };
     });
 
-    this.integrationService.executeMultipleOperation(operationForExcecution).subscribe(res => {
-      if (res) {
-        this.dialog.closeAll();
+    this.integrationService.executeMultipleOperation(operationForExcecution).subscribe({
+      next: (res) => {
+        if (res) {
+          this.dialog.closeAll();
+        }
+        this.spinnerService.hide();
+      },
+      error: (error) => {
+        console.error('Error executing multiple operations:', error);
+        this.spinnerService.hide();
       }
-    })
+    });
   }
 
   viewOperationStatusById(id : string) {
@@ -150,20 +186,28 @@ export class IntegrationsComponent implements OnInit {
   }
 
   getLookups(element: IntegrationOperation) {
+    this.spinnerService.show();
     this.operationRequest.operationId = element.id;
     forkJoin({
       adapters: this.adapterService.getAllAdapters(),
       clients: this.clientService.getAllClients()
-    }).subscribe(({ adapters, clients }) => {
-      if (adapters) {
-        this.adapterOptions = adapters;
+    }).subscribe({
+      next: ({ adapters, clients }) => {
+        if (adapters) {
+          this.adapterOptions = adapters;
+        }
+        if (clients) {
+          this.clientOptions = clients;
+        }
+        // Open dialog after both responses are received
+        this.openDialog('800ms', '500ms');
+        this.spinnerService.hide();
+      },
+      error: (error) => {
+        console.error('Error fetching lookups:', error);
+        this.spinnerService.hide();
       }
-      if (clients) {
-        this.clientOptions = clients;
-      }
-      // Open dialog after both responses are received
-      this.openDialog('800ms', '500ms');
-    })
+    });
   }
 
   addNewIntegration = () => {
@@ -174,16 +218,27 @@ export class IntegrationsComponent implements OnInit {
   }
 
   getIntegrationLookups() {
-    this.clientService.getAllClients().subscribe(res => {
-      if (res) {
-        this.clientOptions = res;
+    this.clientService.getAllClients().subscribe({
+      next: (res) => {
+        if (res) {
+          this.clientOptions = res;
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching clients for integration:', error);
       }
-    })
-    this.integrationService.getAllOperations().subscribe(res => {
-      if (res) {
-        this.operationOptions = res;
+    });
+    
+    this.integrationService.getAllOperations().subscribe({
+      next: (res) => {
+        if (res) {
+          this.operationOptions = res;
+        }
+      },
+      error: (error) => {
+        console.error('Error fetching operations for integration:', error);
       }
-    })
+    });
   }
 
   openIntegrationDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
@@ -214,66 +269,117 @@ export class IntegrationsComponent implements OnInit {
 
   submitIntegration(integrationForm: NgForm) {
     if (integrationForm.invalid) {
-      return
+      return;
     }
-    this.spinnerService.show()
-    debugger
-    this.integrationRequest.userId = this.clientOptions.find(x => x.id == this.integrationRequest.clientId).userId;
-    this.integrationService.createIntegration(this.integrationRequest).subscribe(res => {
-      if (res) {
-        this.dialog.closeAll();
-        this.getIntegrations();
-        this.spinnerService.show()
+    this.spinnerService.show();
+    const client = this.clientOptions.find(x => x.id == this.integrationRequest.clientId);
+    this.integrationRequest.userId = client?.userId || '';
+    
+    this.integrationService.createIntegration(this.integrationRequest).subscribe({
+      next: (res) => {
+        if (res) {
+          this.dialog.closeAll();
+          this.getIntegrations();
+        }
+        this.spinnerService.hide();
+      },
+      error: (error) => {
+        console.error('Error creating integration:', error);
+        this.spinnerService.hide();
       }
-    })
+    });
   }
 
   updateIntegration(integrationForm: NgForm) {
     if (integrationForm.invalid) {
-      return
+      return;
     }
+    
+    if (!this.integrationRequest.integrationId) {
+      console.error('Integration ID is missing for update');
+      return;
+    }
+    
     this.spinnerService.show();
-    this.integrationService.updateIntegration(this.integrationRequest).subscribe(res => {
-      if (res) {
-        this.dialog.closeAll();
-        this.getIntegrations();
+    this.integrationService.updateIntegration(this.integrationRequest, this.integrationRequest.integrationId).subscribe({
+      next: (res) => {
+        if (res) {
+          this.dialog.closeAll();
+          this.getIntegrations();
+        }
+        this.spinnerService.hide();
+      },
+      error: (error) => {
+        console.error('Error updating integration:', error);
         this.spinnerService.hide();
       }
-    })
+    });
   }
 
   getIntegrationID(integration: Integration) {
     this.spinnerService.show();
-    this.integrationService.getIntegrationByID(integration.id).subscribe(res => {
-      if (res) {
-        this.isUpdate = true;
+    this.integrationService.getIntegrationByID(integration.id).subscribe({
+      next: (res) => {
+        if (res) {
+          this.isUpdate = true;
 
-        let operationIds = res.integrationOperations.map(x => x.operationId);
-        debugger
-        this.integrationRequest = {
-          clientId: res.clientId,
-          description: res.description,
-          name: res.name,
-          operationIds: operationIds,
-          userId: this.clientOptions.find(x => x.userId == res.id).userId
+          let operationIds = res.integrationOperations.map(x => x.operationId);
+          const client = this.clientOptions.find(x => x.id == res.clientId);
+          
+          this.integrationRequest = {
+            clientId: res.clientId,
+            description: res.description,
+            name: res.name,
+            operationIds: operationIds,
+            userId: client?.userId || '',
+            integrationId: res.integrationId
+          };
+
+          // Load lookups and then open dialog
+          forkJoin({
+            clients: this.clientService.getAllClients(),
+            operations: this.integrationService.getAllOperations()
+          }).subscribe({
+            next: ({ clients, operations }) => {
+              if (clients) {
+                this.clientOptions = clients;
+              }
+              if (operations) {
+                this.operationOptions = operations;
+              }
+              this.openIntegrationDialog('800ms', '500ms');
+              this.spinnerService.hide();
+            },
+            error: (error) => {
+              console.error('Error loading lookups:', error);
+              this.spinnerService.hide();
+            }
+          });
+        } else {
+          this.spinnerService.hide();
         }
-
-        this.getIntegrationLookups();
-
-        this.openIntegrationDialog('800ms', '500ms');
+      },
+      error: (error) => {
+        console.error('Error fetching integration:', error);
         this.spinnerService.hide();
       }
-    })
+    });
   }
 
   DeleteIntegration(id: string) {
     this.spinnerService.show();
-    this.integrationService.deleteIntegration(id).subscribe(res => {
-      if (res) {
-        this.getIntegrations();
+    this.integrationService.deleteIntegration(id).subscribe({
+      next: (res) => {
+        if (res) {
+          this.getIntegrations();
+        }
+        this.spinnerService.hide();
+      },
+      error: (error) => {
+        console.error('Error deleting integration:', error);
         this.spinnerService.hide();
       }
-    })
+    });
   }
 
 }
